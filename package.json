@@ -1,0 +1,16 @@
+{
+  "name": "api_senzor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "moment": "^2.30.1",
+    "moment-timezone": "^0.5.48"
+  }
+}
