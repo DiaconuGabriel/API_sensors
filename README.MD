@@ -38,6 +38,7 @@ Request Body (JSON):
   "temperature": 22,
   "humidity": 50
 }
+```
 
 ## 3. PUT /measurements_put
 Updates an existing measurement by ID.
@@ -48,6 +49,7 @@ Request Body (JSON):
   "id": 1,
   "CO2": 420
 }
+```
 
 ## 4. DELETE /measurements_delete
 Deletes measurements based on location and optional date range.
