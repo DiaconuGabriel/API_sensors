@@ -30,6 +30,7 @@ Parameters (query):
 Adds a new air quality measurement.
 
 Request Body (JSON):
+```json
 {
   "location": "Iasi",
   "CO2": 400,
@@ -42,6 +43,7 @@ Request Body (JSON):
 Updates an existing measurement by ID.
 
 Request Body (JSON):
+```json
 {
   "id": 1,
   "CO2": 420
