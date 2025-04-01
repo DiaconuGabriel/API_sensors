@@ -73,10 +73,11 @@ const apiKeyMiddleware = (req, res, next) => {
 
 app.get('/', (req, res) => res.json({ message: 'Hello World!' }));
 
-app.use(express.static(path.join(__dirname, 'frontend')));
+// app.use(express.static(path.join(__dirname, 'backend')));
+app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html', 'js', 'css', 'jsx'] }));
 
 app.get('/api_test', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.use(apiKeyMiddleware);

@@ -1,3 +1,6 @@
+import React, { useState } from 'react';
+import Query from "./Query";
+
 function QueryComponent({name, queries, setQueries }) {
     const addQuery = () => {
         setQueries([
@@ -51,3 +54,5 @@ function QueryComponent({name, queries, setQueries }) {
         </div>
     );
 }
+
+export default QueryComponent;

@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+
 function Query({data, onChange }) {
     const handleChange = (field, value) => {
         onChange({
@@ -39,3 +41,5 @@ function Query({data, onChange }) {
         </div>
     );
 }
+
+export default Query;

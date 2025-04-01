@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+
 function LinkAndMethod({ url, setUrl, method, setMethod, sendRequest }){
     return (
         <div className="flex items-center bg-gray-900 p-3">
@@ -30,3 +32,5 @@ function LinkAndMethod({ url, setUrl, method, setMethod, sendRequest }){
         </div>
     );
 }
+
+export default LinkAndMethod;

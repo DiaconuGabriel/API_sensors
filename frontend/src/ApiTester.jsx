@@ -1,3 +1,7 @@
+import React, { useState } from 'react';
+import LinkAndMethod from './LinkAndMethod';
+import QueryComponent from './QueryComponent';
+
 function ApiTester() {
     const [url, setUrl] = React.useState("http://localhost:3000/measurements_get");
     const [method, setMethod] = React.useState("GET");
@@ -129,3 +133,5 @@ function ApiTester() {
         </div>
     );
 }
+
+export default ApiTester;
