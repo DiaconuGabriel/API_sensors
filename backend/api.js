@@ -14,16 +14,16 @@ let id = 0;
 const API_KEY = 'test_key';
 
 const validateLocation = (location) => {
-    if (!location) throw { message: 'Location is required', status: 400 };
+    if (!location) throw { message: 'Location is required!', status: 400 };
     if (Array.isArray(location)) throw { 
         message: 'Only one location parameter!', 
         status: 400 
     };
-    if (!valid_cities.includes(location)) throw { message: 'Location not known', status: 404 };
+    if (!valid_cities.includes(location)) throw { message: 'Location not known!', status: 404 };
 };
 
 const validateDateRange = (startDate, endDate) => {
-    if (!startDate || !endDate) throw { message: 'Both start and end dates are required', status: 400 };
+    if (!startDate || !endDate) throw { message: 'Both start and end dates are required!', status: 400 };
 
     if (Array.isArray(startDate) || Array.isArray(endDate)) throw { 
         message: 'Only one for startDate or endDate!', 
@@ -32,12 +32,12 @@ const validateDateRange = (startDate, endDate) => {
     const dateFormatRegex = /^([1-9]|0[1-9]|[12][0-9]|3[01])\.([1-9]|0[1-9]|1[0-2])\.\d{4}$/;
 
     if (!dateFormatRegex.test(startDate)) throw { 
-        message: 'Start date must be in format D.M.YYYY or DD.MM.YYYY', 
+        message: 'Start date must be in format D.M.YYYY or DD.MM.YYYY!', 
         status: 400 
     };
     
     if (!dateFormatRegex.test(endDate)) throw { 
-        message: 'End date must be in format D.M.YYYY or DD.MM.YYYY', 
+        message: 'End date must be in format D.M.YYYY or DD.MM.YYYY!', 
         status: 400 
     };
 
@@ -48,8 +48,8 @@ const validateDateRange = (startDate, endDate) => {
     console.log(start);
     console.log(end);
 
-    if (isNaN(start) || isNaN(end)) throw { message: 'Dates must be in format DD.MM.YYYY', status: 400 };
-    if (start > end) throw { message: 'Start date must be earlier than end date', status: 400 };
+    if (isNaN(start) || isNaN(end)) throw { message: 'Dates must be in format DD.MM.YYYY!', status: 400 };
+    if (start > end) throw { message: 'Start date must be earlier than end date!', status: 400 };
 
     return { start, end };
 };
@@ -62,7 +62,7 @@ const apiKeyMiddleware = (req, res, next) => {
         if (apiKey === API_KEY) {
             next();
         } else {
-            throw({ message: 'Forbidden: Invalid API key', status: 403 });
+            throw({ message: 'Forbidden: Invalid API key!', status: 403 });
         }
     }
     catch (error) {
@@ -73,7 +73,6 @@ const apiKeyMiddleware = (req, res, next) => {
 
 app.get('/', (req, res) => res.json({ message: 'Hello World!' }));
 
-// app.use(express.static(path.join(__dirname, 'backend')));
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html', 'js', 'css', 'jsx'] }));
 
 app.get('/api_test', (req, res) => {
@@ -93,7 +92,7 @@ app.get('/measurements_get', (req, res) => {
             return res.status(200).json({
                 location,
                 measurements: measurements[location] || [],
-                message: 'Measurements fetched by location',
+                message: 'Measurements fetched by location!',
                 status: 200
             });
         }
@@ -110,7 +109,7 @@ app.get('/measurements_get', (req, res) => {
         res.status(200).json({
             location,
             measurements: filteredMeasurements,
-            message: 'Measurements fetched by location and date range',
+            message: 'Measurements fetched by location and date range!',
             status: 200
         });
     } catch (error) {
@@ -126,7 +125,7 @@ app.post('/measurements_post', (req, res) => {
 
         validateLocation(location);
         if ([CO2, PM25, temperature, humidity].some(value => value === undefined || isNaN(value))) {
-            throw { message: 'All fields must be numbers', status: 400 };
+            throw { message: 'All fields must be present!', status: 400 };
         }
 
         const roTime = moment.tz('Europe/Bucharest').unix();
@@ -148,7 +147,7 @@ app.post('/measurements_post', (req, res) => {
         res.status(200).json({
             location,
             measurement: newMeasurement,
-            message: 'Measurement added successfully',
+            message: 'Measurement added successfully!',
             status: 200
         });
     } catch (error) {
@@ -164,15 +163,19 @@ app.delete('/measurements_delete', (req, res) => {
         validateLocation(location);
 
         if (!startDate && !endDate) {
-            if (!measurements[location].length){
-                return res.status(200).json({ message: 'There werent any to delete', status: 200 });
+            if (!measurements[location] || !measurements[location].length){
+                return res.status(200).json({ message: 'There were no measurements to delete!', status: 200 });
             }
             delete measurements[location];
             console.log(measurements);
-            return res.status(200).json({ message: 'All measurements deleted', status: 200 });
+            return res.status(200).json({ message: 'All measurements deleted!', status: 200 });
         }
 
         const { start, end } = validateDateRange(startDate, endDate);
+
+        if (!measurements[location]) {
+            return res.status(200).json({ message: 'There were no measurements to delete!', status: 200 });
+        }
 
         measurements[location] = (measurements[location] || []).filter(measurement => {
             const timestamp = new Date(measurement.timestamp * 1000);
@@ -183,7 +186,7 @@ app.delete('/measurements_delete', (req, res) => {
         console.log(measurements);
 
         res.status(200).json({
-            message: 'Measurements deleted successfully',
+            message: 'Measurements deleted successfully!',
             status: 200
         });
     } catch (error) {
@@ -198,7 +201,7 @@ app.put('/measurements_put', (req, res) => {
         const {id, CO2, PM25, temperature, humidity } = req.body;
 
         if (id === undefined) {
-            throw { message: 'ID is required', status: 400 };
+            throw { message: 'ID is required!', status: 400 };
         }
 
         let foundMeasurement = null;
@@ -214,11 +217,11 @@ app.put('/measurements_put', (req, res) => {
         }
 
         if (!foundMeasurement) {
-            throw { message: 'Measurement with given ID not found', status: 404 };
+            throw { message: 'Measurement with given ID not found!', status: 404 };
         }
 
         if ([CO2, PM25, temperature, humidity].every(value => value === undefined)) {
-            throw { message: 'At least one field must be provided to update', status: 400 };
+            throw { message: 'At least one field must be provided to update!', status: 400 };
         }
 
         const oldMeasurement = structuredClone(foundMeasurement);

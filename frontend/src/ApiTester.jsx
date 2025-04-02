@@ -69,7 +69,7 @@ function ApiTester() {
                     options.body = JSON.stringify(bodyObj);
                 } catch (error) {
                     console.error("Invalid JSON body:", error.message);
-                    setResponse(`Error: Invalid JSON body - ${error.message}`);
+                    setResponse(`Error: Invalid JSON body`);
                     return;
                 }
             }
