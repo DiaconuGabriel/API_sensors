@@ -9,8 +9,77 @@ const port = 3000;
 app.use(bodyParser.json());
 
 const valid_cities = ['Iasi', 'Bacau', 'Vaslui', 'Neamt', 'Botosani', 'Vrance', 'Galati'];
-let measurements = [];
-let id = 0;
+let measurements = {
+    Iasi: [
+      {
+        id: 0,
+        CO2: 18,
+        PM25: 32,
+        temperature: 9,
+        humidity: 22,
+        timestamp: 1742256000 // 18 martie 2025
+      },
+      {
+        id: 1,
+        CO2: 22,
+        PM25: 28,
+        temperature: 10,
+        humidity: 26,
+        timestamp: 1742342400 // 19 martie 2025
+      },
+      {
+        id: 2,
+        CO2: 19,
+        PM25: 35,
+        temperature: 11,
+        humidity: 30,
+        timestamp: 1743100800 // 25 martie 2025
+      },
+      {
+        id: 3,
+        CO2: 21,
+        PM25: 31,
+        temperature: 12,
+        humidity: 27,
+        timestamp: 1743187200 // 26 martie 2025
+      },
+      {
+        id: 4,
+        CO2: 20,
+        PM25: 33,
+        temperature: 10,
+        humidity: 25,
+        timestamp: 1743273600 // 27 martie 2025
+      }
+    ],
+    Bacau: [
+      {
+        id: 5,
+        CO2: 17,
+        PM25: 30,
+        temperature: 8,
+        humidity: 20,
+        timestamp: 1743700000 // 3 aprilie 2025
+      },
+      {
+        id: 6,
+        CO2: 23,
+        PM25: 27,
+        temperature: 11,
+        humidity: 28,
+        timestamp: 1743750000 // 4 aprilie 2025
+      },
+      {
+        id: 7,
+        CO2: 21,
+        PM25: 29,
+        temperature: 10,
+        humidity: 24,
+        timestamp: 1743800000 // 4 aprilie 2025
+      }
+    ]
+  };
+let id = 8;
 const API_KEY = 'test_key';
 
 const validateLocation = (location) => {
@@ -45,8 +114,8 @@ const validateDateRange = (startDate, endDate) => {
     const start = new Date(formatDate(startDate));
     const end = new Date(formatDate(endDate));
 
-    console.log(start);
-    console.log(end);
+    // console.log(start);
+    // console.log(end);
 
     if (isNaN(start) || isNaN(end)) throw { message: 'Dates must be in format DD.MM.YYYY!', status: 400 };
     if (start > end) throw { message: 'Start date must be earlier than end date!', status: 400 };
@@ -67,7 +136,7 @@ const apiKeyMiddleware = (req, res, next) => {
     }
     catch (error) {
         res.status(error.status).json({ message: error.message, status: error.status });
-        console.log(error);
+        // console.log(error);
     }
 };
 
@@ -164,17 +233,26 @@ app.delete('/measurements_delete', (req, res) => {
 
         if (!startDate && !endDate) {
             if (!measurements[location] || !measurements[location].length){
-                return res.status(200).json({ message: 'There were no measurements to delete!', status: 200 });
+                return res.status(200).json({ location , message: 'There were no measurements to delete!', status: 200 });
             }
             delete measurements[location];
             console.log(measurements);
-            return res.status(200).json({ message: 'All measurements deleted!', status: 200 });
+            return res.status(200).json({ location, message: 'All measurements deleted!', status: 200 });
         }
 
         const { start, end } = validateDateRange(startDate, endDate);
 
         if (!measurements[location]) {
-            return res.status(200).json({ message: 'There were no measurements to delete!', status: 200 });
+            return res.status(200).json({ location, message: 'There were no measurements to delete!', status: 200 });
+        }
+
+        const deletedMeasurements = measurements[location].filter(measurement => {
+            const timestamp = new Date(measurement.timestamp * 1000);
+            return timestamp >= start && timestamp <= end;
+        });
+
+        if(deletedMeasurements.length === 0) {
+            return res.status(200).json({ location, message: 'There were no measurements to delete!', status: 200 });
         }
 
         measurements[location] = (measurements[location] || []).filter(measurement => {
@@ -186,6 +264,8 @@ app.delete('/measurements_delete', (req, res) => {
         console.log(measurements);
 
         res.status(200).json({
+            location,
+            deletedMeasurements,
             message: 'Measurements deleted successfully!',
             status: 200
         });
