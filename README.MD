@@ -62,7 +62,7 @@ Parameters (query):
 - All endpoints (except / and /api_test) require an API key in the request headers 'x-api-key: test_key'
 
 ##  5. /api_test
-- Here you can test the api
+- Here you can test the API
   
 ![image](https://github.com/user-attachments/assets/3769aa65-f9d3-456d-8bfc-fbaa437dc93b)
 ![image](https://github.com/user-attachments/assets/0316e604-fbab-4db9-83f4-53d05cf5afb8)
