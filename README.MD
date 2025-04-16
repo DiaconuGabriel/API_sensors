@@ -61,5 +61,6 @@ Parameters (query):
 ## Authentication
 - All endpoints (except / and /api_test) require an API key in the request headers 'x-api-key: test_key'
 
-
+##  5. /api_test
+- Here you can test the api
   
