@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a simple REST API built with Express.js for managing air quality measurements. The API allows users to store, retrieve, update, and delete air quality data (CO2, PM2.5, temperature, and humidity) for predefined locations.
+This is a simple REST API built with Express.js for managing air quality measurements. The API allows users to store, retrieve, update, and delete air quality data (CO2, PM2.5, temperature, and humidity) for predefined locations. The interface for testing was created with React and Tailwind.
 
 ## Features
 - Retrieve measurements based on location and date range.
@@ -60,3 +60,10 @@ Parameters (query):
 
 ## Authentication
 - All endpoints (except / and /api_test) require an API key in the request headers 'x-api-key: test_key'
+
+##  5. /api_test
+- Here you can test the API
+  
+![image](https://github.com/user-attachments/assets/3769aa65-f9d3-456d-8bfc-fbaa437dc93b)
+![image](https://github.com/user-attachments/assets/0316e604-fbab-4db9-83f4-53d05cf5afb8)
+
