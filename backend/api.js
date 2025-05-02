@@ -189,7 +189,7 @@ app.delete('/measurements_delete', async (req, res) => {
         
         res.status(200).json({
             location,
-            deletedMeasurements : deletedMeasurementsbyBoth[0],
+            deletedMeasurements : deletedMeasurementsbyBoth,
             message: 'Measurements deleted successfully!',
             status: 200
         });
