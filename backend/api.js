@@ -1,86 +1,22 @@
+require('dotenv').config();
+const { addDataToTable, getMeasurementsByLocation, getMeasurementsByLocationAndDate, deleteMeasurementsByLocation, deleteMeasurementsByLocationAndDate, updateMeasurementById, getMeasurementById } = require('./supabasetest.js');
 const express = require('express');
+const path = require('path');
 const bodyParser = require('body-parser');
 const moment = require('moment-timezone');
-const path = require('path');
+const cors = require('cors');
 
 const app = express();
-const port = 3000;
-
-app.use(bodyParser.json());
+const port = process.env.PORT || 3000;
 
 const valid_cities = ['Iasi', 'Bacau', 'Vaslui', 'Neamt', 'Botosani', 'Vrance', 'Galati'];
-let measurements = {
-    Iasi: [
-      {
-        id: 0,
-        CO2: 18,
-        PM25: 32,
-        temperature: 9,
-        humidity: 22,
-        timestamp: 1742256000 // 18 martie 2025
-      },
-      {
-        id: 1,
-        CO2: 22,
-        PM25: 28,
-        temperature: 10,
-        humidity: 26,
-        timestamp: 1742342400 // 19 martie 2025
-      },
-      {
-        id: 2,
-        CO2: 19,
-        PM25: 35,
-        temperature: 11,
-        humidity: 30,
-        timestamp: 1743100800 // 25 martie 2025
-      },
-      {
-        id: 3,
-        CO2: 21,
-        PM25: 31,
-        temperature: 12,
-        humidity: 27,
-        timestamp: 1743187200 // 26 martie 2025
-      },
-      {
-        id: 4,
-        CO2: 20,
-        PM25: 33,
-        temperature: 10,
-        humidity: 25,
-        timestamp: 1743273600 // 27 martie 2025
-      }
-    ],
-    Bacau: [
-      {
-        id: 5,
-        CO2: 17,
-        PM25: 30,
-        temperature: 8,
-        humidity: 20,
-        timestamp: 1743700000 // 3 aprilie 2025
-      },
-      {
-        id: 6,
-        CO2: 23,
-        PM25: 27,
-        temperature: 11,
-        humidity: 28,
-        timestamp: 1743750000 // 4 aprilie 2025
-      },
-      {
-        id: 7,
-        CO2: 21,
-        PM25: 29,
-        temperature: 10,
-        humidity: 24,
-        timestamp: 1743800000 // 4 aprilie 2025
-      }
-    ]
-  };
-let id = 8;
-const API_KEY = 'test_key';
+
+const API_KEY = process.env.API_KEY;
+const tableName = process.env.TABLE_NAME;
+
+app.use(cors());
+
+app.use(bodyParser.json());
 
 const validateLocation = (location) => {
     if (!location) throw { message: 'Location is required!', status: 400 };
@@ -111,14 +47,16 @@ const validateDateRange = (startDate, endDate) => {
     };
 
     const formatDate = date => date.split('.').reverse().join('-');
-    const start = new Date(formatDate(startDate));
-    const end = new Date(formatDate(endDate));
+    const start_obj = new Date(formatDate(startDate));
+    const end_obj = new Date(formatDate(endDate));
 
-    // console.log(start);
-    // console.log(end);
 
-    if (isNaN(start) || isNaN(end)) throw { message: 'Dates must be in format DD.MM.YYYY!', status: 400 };
-    if (start > end) throw { message: 'Start date must be earlier than end date!', status: 400 };
+    if (isNaN(start_obj) || isNaN(end_obj)) throw { message: 'Dates must be in format DD.MM.YYYY!', status: 400 };
+    if (start_obj > end_obj) throw { message: 'Start date must be earlier than end date!', status: 400 };
+
+    // Convertim în timestamp Unix (secunde)
+    const start = Math.floor(start_obj.getTime() / 1000);
+    const end = Math.floor(end_obj.getTime() / 1000);
 
     return { start, end };
 };
@@ -135,8 +73,7 @@ const apiKeyMiddleware = (req, res, next) => {
         }
     }
     catch (error) {
-        res.status(error.status).json({ message: error.message, status: error.status });
-        // console.log(error);
+        res.status(error.status || 500).json({ message: error.message, status: error.status });
     }
 };
 
@@ -150,17 +87,21 @@ app.get('/api_test', (req, res) => {
 
 app.use(apiKeyMiddleware);
 
-app.get('/measurements_get', (req, res) => {
+app.get('/measurements_get', async (req, res) => {
     try {
-
+        
         const { location, startDate, endDate } = req.query;
         
         validateLocation(location);
 
         if (!startDate && !endDate) {
+            const measurementsbylocation = await getMeasurementsByLocation(tableName, location);
+            if(!measurementsbylocation || measurementsbylocation.length === 0){
+                return res.status(200).json({ location, message: 'There were no measurements to get by location!', status: 200 });
+            }
             return res.status(200).json({
                 location,
-                measurements: measurements[location] || [],
+                measurements: measurementsbylocation || [],
                 message: 'Measurements fetched by location!',
                 status: 200
             });
@@ -168,25 +109,23 @@ app.get('/measurements_get', (req, res) => {
 
         const { start, end } = validateDateRange(startDate, endDate);
 
-        const filteredMeasurements = (measurements[location] || []).filter(measurement => {
-            const timestamp = new Date(measurement.timestamp * 1000);
-            return timestamp >= start && timestamp <= end;
-        });
+        const measurementsbylocandate = await getMeasurementsByLocationAndDate(tableName, location, start, end);
 
-        console.log(measurements);
-
+        if(!measurementsbylocandate || measurementsbylocandate.length === 0){
+            return res.status(200).json({ location, message: 'There were no measurements to get by location and date!', status: 200 });
+        }
         res.status(200).json({
             location,
-            measurements: filteredMeasurements,
+            measurements: measurementsbylocandate,
             message: 'Measurements fetched by location and date range!',
             status: 200
         });
     } catch (error) {
-        res.status(error.status).json({ message: error.message, status: error.status });
+        res.status(error.status || 500).json({ message: error.message, status: error.status });
     }
 });
 
-app.post('/measurements_post', (req, res) => {
+app.post('/measurements_post', async (req, res) => {
     
     try {
        
@@ -199,32 +138,27 @@ app.post('/measurements_post', (req, res) => {
 
         const roTime = moment.tz('Europe/Bucharest').unix();
         const newMeasurement = {
-            id: id++,
-            CO2: parseInt(CO2, 10),
-            PM25: parseInt(PM25, 10),
+            co2: parseInt(CO2, 10),
+            'pm2.5': parseInt(PM25, 10),
             temperature: parseInt(temperature, 10),
             humidity: parseInt(humidity, 10),
-            timestamp: roTime
+            timestamp: roTime,
+            city: location
         };
 
-        if (!(location in measurements)) {
-            measurements[location] = [];
-        }
-        measurements[location].push(newMeasurement);
-        console.log(measurements);
-
+        const insertedData = await addDataToTable(tableName, newMeasurement);
         res.status(200).json({
             location,
-            measurement: newMeasurement,
+            measurement: insertedData,
             message: 'Measurement added successfully!',
             status: 200
         });
     } catch (error) {
-        res.status(error.status).json({ message: error.message, status: error.status });
+        res.status(error.status || 500).json({ message: error.message, status: error.status });
     }
 });
 
-app.delete('/measurements_delete', (req, res) => {
+app.delete('/measurements_delete', async (req, res) => {
     try {
 
         const { location, startDate, endDate } = req.query;
@@ -232,49 +166,35 @@ app.delete('/measurements_delete', (req, res) => {
         validateLocation(location);
 
         if (!startDate && !endDate) {
-            if (!measurements[location] || !measurements[location].length){
-                return res.status(200).json({ location , message: 'There were no measurements to delete!', status: 200 });
+            const deletedMeasurements = await deleteMeasurementsByLocation(tableName,location);
+
+            if(deletedMeasurements && deletedMeasurements.length > 0){
+                return res.status(200).json({ location, deletedMeasurements: deletedMeasurements,  message: 'All measurements deleted!', status: 200 });
+            } else {
+                return res.status(200).json({ location, message: 'There were no measurements to delete!', status: 200 });
             }
-            delete measurements[location];
-            console.log(measurements);
-            return res.status(200).json({ location, message: 'All measurements deleted!', status: 200 });
         }
 
         const { start, end } = validateDateRange(startDate, endDate);
 
-        if (!measurements[location]) {
+        const deletedMeasurementsbyBoth = await deleteMeasurementsByLocationAndDate(tableName, location, start, end);
+
+        if(!deletedMeasurementsbyBoth || deletedMeasurementsbyBoth.length === 0){
             return res.status(200).json({ location, message: 'There were no measurements to delete!', status: 200 });
         }
-
-        const deletedMeasurements = measurements[location].filter(measurement => {
-            const timestamp = new Date(measurement.timestamp * 1000);
-            return timestamp >= start && timestamp <= end;
-        });
-
-        if(deletedMeasurements.length === 0) {
-            return res.status(200).json({ location, message: 'There were no measurements to delete!', status: 200 });
-        }
-
-        measurements[location] = (measurements[location] || []).filter(measurement => {
-            const timestamp = new Date(measurement.timestamp * 1000);
-            return timestamp < start || timestamp > end;
-        });
-
-        if (!measurements[location].length) delete measurements[location];
-        console.log(measurements);
-
+        
         res.status(200).json({
             location,
-            deletedMeasurements,
+            deletedMeasurements : deletedMeasurementsbyBoth,
             message: 'Measurements deleted successfully!',
             status: 200
         });
     } catch (error) {
-        res.status(error.status).json({ message: error.message, status: error.status });
+        res.status(error.status || 500).json({ message: error.message, status: error.status });
     }
 });
 
-app.put('/measurements_put', (req, res) => {
+app.put('/measurements_put', async (req, res) => {
     
     try {
 
@@ -284,50 +204,41 @@ app.put('/measurements_put', (req, res) => {
             throw { message: 'ID is required!', status: 400 };
         }
 
-        let foundMeasurement = null;
-        let foundLocation = null;
-
-        for (const location in measurements) {
-            const measurementIndex = measurements[location].findIndex(m => m.id === parseInt(id));
-            if (measurementIndex !== -1) {
-                foundMeasurement = measurements[location][measurementIndex];
-                foundLocation = location;
-                break;
-            }
-        }
-
-        if (!foundMeasurement) {
-            throw { message: 'Measurement with given ID not found!', status: 404 };
-        }
-
         if ([CO2, PM25, temperature, humidity].every(value => value === undefined)) {
             throw { message: 'At least one field must be provided to update!', status: 400 };
         }
 
-        const oldMeasurement = structuredClone(foundMeasurement);
+        const oldMeasurement = await getMeasurementById(tableName, id);
         
-        if (CO2 !== undefined) foundMeasurement.CO2 = parseInt(CO2, 10);
-        if (PM25 !== undefined) foundMeasurement.PM25 = parseInt(PM25, 10);
-        if (temperature !== undefined) foundMeasurement.temperature = parseInt(temperature, 10);
-        if (humidity !== undefined) foundMeasurement.humidity = parseInt(humidity, 10);
+        if (!oldMeasurement) {
+            throw { message: 'Measurement with given ID not found!', status: 404 };
+        }
+        
+        const updatedData = {};
+        if (CO2 !== undefined) updatedData.co2 = parseInt(CO2, 10);
+        if (PM25 !== undefined) updatedData['pm2.5'] = parseInt(PM25, 10);
+        if (temperature !== undefined) updatedData.temperature = parseInt(temperature, 10);
+        if (humidity !== undefined) updatedData.humidity = parseInt(humidity, 10);
 
-        console.log(measurements);
+        const updateResult = await updateMeasurementById(tableName, id, updatedData);
+        
+        const newMeasurement = updateResult && updateResult.length > 0 ? updateResult : [];
 
         res.status(200).json({
-            location: foundLocation,
+            location: newMeasurement.city,
             measurement: {
-                old:oldMeasurement,
-                new:foundMeasurement},
+                old: oldMeasurement,
+                new: newMeasurement
+            },
             message: 'Measurement updated successfully',
             status: 200
         });
 
     } catch (error) {
-        res.status(error.status).json({ message: error.message, status: error.status });
+        res.status(error.status || 500).json({ message: error.message, status: error.status });
     }
 });
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-    console.log(measurements);
 });
