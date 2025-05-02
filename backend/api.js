@@ -142,8 +142,8 @@ app.post('/measurements_post', async (req, res) => {
 
         const roTime = moment.tz('Europe/Bucharest').unix();
         const newMeasurement = {
-            CO2: parseInt(CO2, 10),
-            'PM2.5': parseInt(PM25, 10),
+            co2: parseInt(CO2, 10),
+            'pm2.5': parseInt(PM25, 10),
             temperature: parseInt(temperature, 10),
             humidity: parseInt(humidity, 10),
             timestamp: roTime,
@@ -219,8 +219,8 @@ app.put('/measurements_put', async (req, res) => {
         }
         
         const updatedData = {};
-        if (CO2 !== undefined) updatedData.CO2 = parseInt(CO2, 10);
-        if (PM25 !== undefined) updatedData['PM2.5'] = parseInt(PM25, 10);
+        if (CO2 !== undefined) updatedData.co2 = parseInt(CO2, 10);
+        if (PM25 !== undefined) updatedData['pm2.5'] = parseInt(PM25, 10);
         if (temperature !== undefined) updatedData.temperature = parseInt(temperature, 10);
         if (humidity !== undefined) updatedData.humidity = parseInt(humidity, 10);
 

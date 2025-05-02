@@ -19,8 +19,8 @@ function ApiTester() {
         }, null, 2),
         "https://api-sensors-9kta.onrender.com/measurements_post": JSON.stringify({
             "location": "City",
-            "CO2": 0,
-            "PM25": 0,
+            "co2": 0,
+            "pm2.5": 0,
             "temperature": 0,
             "humidity": 0
         }, null, 2),
@@ -28,8 +28,8 @@ function ApiTester() {
         }, null, 2),
         "https://api-sensors-9kta.onrender.com/measurements_put": JSON.stringify({
             "id": 0,
-            "CO2": 0,
-            "PM25": 0,
+            "co2": 0,
+            "pm2.5": 0,
             "temperature": 0,
             "humidity": 0
         }, null, 2)
