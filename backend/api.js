@@ -212,6 +212,10 @@ app.put('/measurements_put', async (req, res) => {
             throw { message: 'At least one field must be provided to update!', status: 400 };
         }
 
+        if ([co2, pm25, humidity].some(value => value < 0)) {
+            throw { message: 'C02, PM2.5 and humidity can\'t be negative', status: 400 };
+        }
+
         const oldMeasurement = await getMeasurementById(tableName, id);
         
         if (!oldMeasurement) {
