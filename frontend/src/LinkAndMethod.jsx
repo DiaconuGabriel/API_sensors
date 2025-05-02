@@ -18,10 +18,10 @@ function LinkAndMethod({ url, setUrl, method, setMethod, sendRequest }){
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
             >
-                <option>http://localhost:3000/measurements_get</option>
-                <option>http://localhost:3000/measurements_post</option>
-                <option>http://localhost:3000/measurements_delete</option>
-                <option>http://localhost:3000/measurements_put</option>
+                <option>https://api-sensors-9kta.onrender.com/measurements_get</option>
+                <option>https://api-sensors-9kta.onrender.com/measurements_post</option>
+                <option>https://api-sensors-9kta.onrender.com/measurements_delete</option>
+                <option>https://api-sensors-9kta.onrender.com/measurements_put</option>
                 </select>    
             <button
                 className="w-32 h-16 bg-blue-500 text-white p-3 hover:bg-blue-600 border"
