@@ -13,8 +13,7 @@ async function addDataToTable(tableName, data) {
         .select();
 
     if (error) {
-        console.error('Eroare la inserarea datelor:', error);
-        throw { message: 'Nu s-au putut insera datele.', status: 500 };
+        throw { message: 'Can\'t insert data.', status: 500 };
     }
 
     // console.log('Datele au fost inserate cu succes:', insertedData);
@@ -31,8 +30,7 @@ async function getMeasurementsByLocation(tableName, location) {
         .order('id', { ascending: true });
 
     if (error) {
-        console.error('Eroare la obținerea măsurătorilor:', error);
-        throw { message: 'Nu s-au putut obține măsurătorile.', status: 500 };
+        throw { message: 'Can\'t get data by location.', status: 500 };
     }
 
     return data;
@@ -50,8 +48,7 @@ async function getMeasurementsByLocationAndDate(tableName, location, startDate, 
         .order('id', { ascending: true });
 
     if (error) {
-        console.error('Eroare la obținerea măsurătorilor:', error);
-        throw { message: 'Nu s-au putut obține măsurătorile.', status: 500 };
+        throw { message: 'Can\'t get data by location and date.', status: 500 };
     }
 
     return data;
@@ -68,8 +65,7 @@ async function deleteMeasurementsByLocation(tableName, location) {
         .order('id', { ascending: true });
 
     if (selectError) {
-        console.error('Eroare la obținerea măsurătorilor pentru ștergere:', selectError);
-        throw { message: 'Nu s-au putut obține măsurătorile pentru ștergere.', status: 500 };
+        throw { message: 'Can\'t get data that need to be deleted.', status: 500 };
     }
 
     if (!dataToDelete || dataToDelete.length === 0) {
@@ -82,8 +78,7 @@ async function deleteMeasurementsByLocation(tableName, location) {
         .eq('city', location);
 
     if (deleteError) {
-        console.error('Eroare la ștergerea măsurătorilor:', deleteError);
-        throw { message: 'Nu s-au putut șterge măsurătorile.', status: 500 };
+        throw { message: 'Can\'t delete data by location.', status: 500 };
     }
 
     return dataToDelete;
@@ -102,8 +97,7 @@ async function deleteMeasurementsByLocationAndDate(tableName, location, startDat
         .order('id', { ascending: true });
 
     if (selectError) {
-        console.error('Eroare la obținerea măsurătorilor pentru ștergere:', selectError);
-        throw { message: 'Nu s-au putut obține măsurătorile pentru ștergere.', status: 500 };
+        throw { message: 'Can\'t get data that need to be deleted.', status: 500 };
     }
 
     if (!dataToDelete || dataToDelete.length === 0) {
@@ -118,8 +112,7 @@ async function deleteMeasurementsByLocationAndDate(tableName, location, startDat
         .lte('timestamp', endDate);
 
     if (deleteError) {
-        console.error('Eroare la ștergerea măsurătorilor:', deleteError);
-        throw { message: 'Nu s-au putut șterge măsurătorile.', status: 500 };
+        throw { message: 'Can\'t delete data by location and date.', status: 500 };
     }
 
     return dataToDelete;
@@ -136,13 +129,13 @@ async function updateMeasurementById(tableName, id, updatedData) {
         .order('id', { ascending: true });
 
     if (error) {
-        console.error('Eroare la actualizarea măsurătorilor:', error);
-        throw { message: 'Eroare la actualizarea măsurătorii', status: 500 };
+        throw { message: 'Error to update measurement', status: 500 };
     }
 
     return data;
 }
 
+// get
 // Funcție pentru a obține o măsurătoare după ID
 async function getMeasurementById(tableName, id) {
     const { data, error } = await supabase
@@ -153,8 +146,7 @@ async function getMeasurementById(tableName, id) {
         .order('id', { ascending: true });
 
     if (error) {
-        console.error('Eroare la obținerea măsurătorii:', error);
-        throw { message: 'Nu exista o masuratoare cu id-ul ' + id + '.', status: 500 };
+        throw { message: 'There is no measurement with id: ' + id + '.', status: 500 };
     }
 
     return data;

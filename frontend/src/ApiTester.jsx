@@ -15,18 +15,18 @@ function ApiTester() {
     const [response, setResponse] = React.useState("");
 
     const defaultBodies = {
-        "http://localhost:3000/measurements_get": JSON.stringify({
+        "https://api-sensors-9kta.onrender.com/measurements_get": JSON.stringify({
         }, null, 2),
-        "http://localhost:3000/measurements_post": JSON.stringify({
+        "https://api-sensors-9kta.onrender.com/measurements_post": JSON.stringify({
             "location": "City",
             "CO2": 0,
             "PM25": 0,
             "temperature": 0,
             "humidity": 0
         }, null, 2),
-        "http://localhost:3000/measurements_delete": JSON.stringify({
+        "https://api-sensors-9kta.onrender.com/measurements_delete": JSON.stringify({
         }, null, 2),
-        "http://localhost:3000/measurements_put": JSON.stringify({
+        "https://api-sensors-9kta.onrender.com/measurements_put": JSON.stringify({
             "id": 0,
             "CO2": 0,
             "PM25": 0,
