@@ -136,10 +136,14 @@ app.post('/measurements_post', async (req, res) => {
             throw { message: 'All fields must be present!', status: 400 };
         }
 
+        if ([CO2, PM25, humidity].some(value => value < 0)) {
+            throw { message: 'C02, PM2.5 and humidity can\'t be negative', status: 400 };
+        }
+
         const roTime = moment.tz('Europe/Bucharest').unix();
         const newMeasurement = {
-            co2: parseInt(CO2, 10),
-            'pm2.5': parseInt(PM25, 10),
+            CO2: parseInt(CO2, 10),
+            'PM2.5': parseInt(PM25, 10),
             temperature: parseInt(temperature, 10),
             humidity: parseInt(humidity, 10),
             timestamp: roTime,
@@ -185,7 +189,7 @@ app.delete('/measurements_delete', async (req, res) => {
         
         res.status(200).json({
             location,
-            deletedMeasurements : deletedMeasurementsbyBoth,
+            deletedMeasurements : deletedMeasurementsbyBoth[0],
             message: 'Measurements deleted successfully!',
             status: 200
         });
@@ -215,8 +219,8 @@ app.put('/measurements_put', async (req, res) => {
         }
         
         const updatedData = {};
-        if (CO2 !== undefined) updatedData.co2 = parseInt(CO2, 10);
-        if (PM25 !== undefined) updatedData['pm2.5'] = parseInt(PM25, 10);
+        if (CO2 !== undefined) updatedData.CO2 = parseInt(CO2, 10);
+        if (PM25 !== undefined) updatedData['PM2.5'] = parseInt(PM25, 10);
         if (temperature !== undefined) updatedData.temperature = parseInt(temperature, 10);
         if (humidity !== undefined) updatedData.humidity = parseInt(humidity, 10);
 
@@ -228,7 +232,7 @@ app.put('/measurements_put', async (req, res) => {
             location: newMeasurement.city,
             measurement: {
                 old: oldMeasurement,
-                new: newMeasurement
+                new: newMeasurement[0]
             },
             message: 'Measurement updated successfully',
             status: 200
