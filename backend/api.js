@@ -129,21 +129,21 @@ app.post('/measurements_post', async (req, res) => {
     
     try {
        
-        const { location, CO2, PM25, temperature, humidity } = req.body;
+        const { location, co2, 'pm2.5': pm25, temperature, humidity } = req.body;
 
         validateLocation(location);
-        if ([CO2, PM25, temperature, humidity].some(value => value === undefined || isNaN(value))) {
+        if ([co2, pm25, temperature, humidity].some(value => value === undefined || isNaN(value))) {
             throw { message: 'All fields must be present!', status: 400 };
         }
 
-        if ([CO2, PM25, humidity].some(value => value < 0)) {
+        if ([co2, pm25, humidity].some(value => value < 0)) {
             throw { message: 'C02, PM2.5 and humidity can\'t be negative', status: 400 };
         }
 
         const roTime = moment.tz('Europe/Bucharest').unix();
         const newMeasurement = {
-            co2: parseInt(CO2, 10),
-            'pm2.5': parseInt(PM25, 10),
+            co2: parseInt(co2, 10),
+            'pm2.5': parseInt(pm25, 10),
             temperature: parseInt(temperature, 10),
             humidity: parseInt(humidity, 10),
             timestamp: roTime,
@@ -202,13 +202,13 @@ app.put('/measurements_put', async (req, res) => {
     
     try {
 
-        const {id, CO2, PM25, temperature, humidity } = req.body;
+        const {id, co2, 'pm2.5': pm25, temperature, humidity } = req.body;
 
         if (id === undefined) {
             throw { message: 'ID is required!', status: 400 };
         }
 
-        if ([CO2, PM25, temperature, humidity].every(value => value === undefined)) {
+        if ([co2, pm25, temperature, humidity].every(value => value === undefined)) {
             throw { message: 'At least one field must be provided to update!', status: 400 };
         }
 
@@ -219,8 +219,8 @@ app.put('/measurements_put', async (req, res) => {
         }
         
         const updatedData = {};
-        if (CO2 !== undefined) updatedData.co2 = parseInt(CO2, 10);
-        if (PM25 !== undefined) updatedData['pm2.5'] = parseInt(PM25, 10);
+        if (co2 !== undefined) updatedData.co2 = parseInt(co2, 10);
+        if (pm25 !== undefined) updatedData['pm2.5'] = parseInt(pm25, 10);
         if (temperature !== undefined) updatedData.temperature = parseInt(temperature, 10);
         if (humidity !== undefined) updatedData.humidity = parseInt(humidity, 10);
 
