@@ -1,6 +1,6 @@
 # Air Quality Measurement API
 
-## You can test the api here: https://api-sensors-9kta.onrender.com
+## You can test the api here: https://api-sensors-9kta.onrender.com/api_test
 
 ## Description
 
