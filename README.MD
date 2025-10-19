@@ -2,6 +2,9 @@
 
 ## You can test the api here: https://api-sensors-9kta.onrender.com/api_test
 
+## Authentication
+- All endpoints (except / and /api_test) require an API key in the request headers 'x-api-key: test_key'
+
 ## Description
 
 This is a simple REST API built with Express.js for managing air quality measurements. The API allows users to store, retrieve, update, and delete air quality data (CO2, PM2.5, temperature, and humidity) for predefined locations. The interface for testing was created with React and Tailwind.
@@ -59,9 +62,6 @@ Deletes measurements based on location and optional date range.
 Parameters (query):
 - location (string) - Required
 - startDate and endDate (optional, DD.MM.YYYY format)
-
-## Authentication
-- All endpoints (except / and /api_test) require an API key in the request headers 'x-api-key: test_key'
 
 ##  5. /api_test
 - Here you can test the API
